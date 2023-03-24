@@ -2,6 +2,7 @@ package com.example.webservice.repository;
 
 
 import com.example.webservice.entity.Company;
+import com.example.webservice.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
@@ -27,6 +28,7 @@ public interface CompanyRepository extends CrudRepository<Company, Long> {
     List<Company> findCompaniesByNameOrderByCreationDate(String name);
 
     List<Company> findCompaniesByNameOrderByName(String name);
+
 
 
 }

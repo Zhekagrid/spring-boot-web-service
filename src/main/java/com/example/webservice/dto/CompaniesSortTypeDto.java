@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class SortTypeDto {
+public class CompaniesSortTypeDto {
     private String name;
     private Date dateFrom;
     private Date dateTo;
