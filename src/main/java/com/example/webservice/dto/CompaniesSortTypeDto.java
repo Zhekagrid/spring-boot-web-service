@@ -11,5 +11,5 @@ public class CompaniesSortTypeDto {
     private Date dateFrom;
     private Date dateTo;
     private String sortKey;
-    private String sortType;
+    private SortType sortType;
 }

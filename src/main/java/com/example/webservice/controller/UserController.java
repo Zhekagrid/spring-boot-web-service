@@ -1,40 +1,39 @@
 package com.example.webservice.controller;
 
+import com.example.webservice.dto.LoginInfoDto;
 import com.example.webservice.entity.User;
 import com.example.webservice.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping(value = "/signUp")
-    public ResponseEntity<User> signUp(@Valid @RequestBody User user) {
-        User createdUser = userRepository.save(user);
-        //todo password encode
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<User> signUp(@Valid @RequestBody LoginInfoDto loginInfoDto) {
+        String username = loginInfoDto.getUsername();
+        if (!userRepository.existsByUsername(username)) {
+            String password = loginInfoDto.getPassword();
+            String encodedPassword = passwordEncoder.encode(password);
+            User user = new User(username, encodedPassword);
+            User createdUser = userRepository.save(user);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(new User("Login must be unique"), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @PostMapping(value = "/login")
-    public ResponseEntity<User> login(@RequestParam(name = "Username") String username, @RequestParam String password) {
-      //  user.setLastLoginDate(LocalDate.now());
-//        User createdUser = userRepository.findUserByUsername(username).get();
-//        System.out.println(username+" "+password);
-//        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        return null;
-    }
+
 }

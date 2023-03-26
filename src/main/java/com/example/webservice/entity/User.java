@@ -17,22 +17,28 @@ import java.util.Collection;
 @Data
 @Table(name = "USERS")
 public class User implements UserDetails {
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotBlank(message = "Login required")
-    @Size(max = 16, message = "Maximum 16 characters")
     @Column(nullable = false, unique = true, length = 16)
     private String username;
-
-    @NotBlank(message = "Password required")
-    //@Size(max = 16,message = "Maximum 16 characters")
-    //todo
     @Column(nullable = false)
     private String password;
     @Column
     private LocalDate lastLoginDate;
+
+    public User() {
+
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -2,6 +2,7 @@ package com.example.webservice.controller;
 
 import com.example.webservice.dto.EmployeeFormDto;
 import com.example.webservice.dto.CompaniesSortTypeDto;
+import com.example.webservice.dto.SortType;
 import com.example.webservice.entity.Company;
 import com.example.webservice.entity.Employee;
 import com.example.webservice.repository.CompanyRepository;
@@ -68,9 +69,9 @@ public class CompanyController {
         } else if (companiesSortTypeDto.getSortKey().equals("creationDate")) {
             companyPath = root.get("creationDate");
         }
-        if (companiesSortTypeDto.getSortType().equals("asc")) {
+        if (companiesSortTypeDto.getSortType().equals(SortType.ASC)) {
             cq.orderBy(cb.asc(companyPath));
-        } else if (companiesSortTypeDto.getSortType().equals("desc")) {
+        } else if (companiesSortTypeDto.getSortType().equals(SortType.DESC)) {
             cq.orderBy(cb.desc(companyPath));
         }
 

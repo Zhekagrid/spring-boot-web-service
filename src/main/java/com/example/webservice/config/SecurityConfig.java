@@ -2,22 +2,34 @@ package com.example.webservice.config;
 
 import com.example.webservice.entity.User;
 import com.example.webservice.repository.UserRepository;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
 @Configuration
 public class SecurityConfig {
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -27,13 +39,10 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> {
-
             Optional<User> optionalUser = userRepository.findUserByUsername(username);
             if (optionalUser.isPresent()) {
-                System.out.println("security");
                 return optionalUser.get();
             }
-
             throw new UsernameNotFoundException("User: " + username + " not found");
         };
     }
@@ -43,17 +52,33 @@ public class SecurityConfig {
             AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
+    @Bean
+    public BasicAuthenticationFilter basicAuthenticationFilter() throws Exception {
+        return new CustomBasicAuthFilter(authenticationManager(new AuthenticationConfiguration()));
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.authorizeHttpRequests()
-                .requestMatchers("/users/*","/company/*")
-                .permitAll()
-
+        return httpSecurity.addFilterAt(basicAuthenticationFilter(), BasicAuthenticationFilter.class).
+                authorizeHttpRequests()
+                .requestMatchers("/users/*").permitAll()
+                .anyRequest().authenticated()
                 .and()
-
-                .formLogin()
-                .loginProcessingUrl("/login")
-                .and().csrf().disable()
+                .httpBasic().and()
+                .csrf().disable()
                 .build();
+    }
+}
+
+class MySimpleUrlAuthenticationSuccessHandler
+        implements AuthenticationSuccessHandler {
+
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response, Authentication authentication)
+            throws IOException {
+        System.out.println("Ddddd");
     }
 }
