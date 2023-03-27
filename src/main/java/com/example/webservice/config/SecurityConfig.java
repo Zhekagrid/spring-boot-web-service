@@ -5,6 +5,7 @@ import com.example.webservice.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.mapstruct.control.MappingControl;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,7 @@ import java.util.Optional;
 
 @Configuration
 public class SecurityConfig {
-
+    private static final String USERS_URL = "/users/*";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,7 +63,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.addFilterAt(basicAuthenticationFilter(), BasicAuthenticationFilter.class).
                 authorizeHttpRequests()
-                .requestMatchers("/users/*").permitAll()
+                .requestMatchers(USERS_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic().and()
@@ -71,14 +72,3 @@ public class SecurityConfig {
     }
 }
 
-class MySimpleUrlAuthenticationSuccessHandler
-        implements AuthenticationSuccessHandler {
-
-
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response, Authentication authentication)
-            throws IOException {
-        System.out.println("Ddddd");
-    }
-}

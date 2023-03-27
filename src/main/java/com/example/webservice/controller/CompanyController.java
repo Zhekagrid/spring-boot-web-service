@@ -3,37 +3,51 @@ package com.example.webservice.controller;
 import com.example.webservice.dto.EmployeeFormDto;
 import com.example.webservice.dto.CompaniesSortTypeDto;
 import com.example.webservice.dto.SortType;
+import com.example.webservice.mapper.EmployeeMapper;
 import com.example.webservice.entity.Company;
+import com.example.webservice.entity.CompanyEmployee;
+import com.example.webservice.entity.CompanyEmployeeId;
 import com.example.webservice.entity.Employee;
+import com.example.webservice.repository.CompanyEmployeeRepository;
 import com.example.webservice.repository.CompanyRepository;
 import com.example.webservice.repository.EmployeeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+
+import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
+import java.util.stream.Collectors;
+
+import static com.example.webservice.controller.FieldName.*;
 
 @RestController
 @Validated
 @RequestMapping("/company")
-@AllArgsConstructor
 
 public class CompanyController {
 
     private EntityManager entityManager;
     private CompanyRepository companyRepository;
     private EmployeeRepository employeeRepository;
+    private CompanyEmployeeRepository companyEmployeeRepository;
+    private EmployeeMapper employeeMapper = Mappers.getMapper(EmployeeMapper.class);
+
+    public CompanyController(EntityManager entityManager, CompanyRepository companyRepository, EmployeeRepository employeeRepository, CompanyEmployeeRepository companyEmployeeRepository) {
+        this.entityManager = entityManager;
+        this.companyRepository = companyRepository;
+        this.employeeRepository = employeeRepository;
+        this.companyEmployeeRepository = companyEmployeeRepository;
+    }
 
     @PostMapping("/addCompany")
     public ResponseEntity<Company> processForm(@Valid @RequestBody Company company) {
@@ -52,22 +66,22 @@ public class CompanyController {
         CriteriaQuery<Company> cq = cb.createQuery(Company.class);
         Root<Company> root = cq.from(Company.class);
 
-        Predicate wherePredicate = cb.isNotNull(root.get("unp"));
+        Predicate wherePredicate = cb.isNotNull(root.get(UNP));
         if (companiesSortTypeDto.getName() != null) {
-            wherePredicate = cb.equal(root.get("name"), companiesSortTypeDto.getName());
+            wherePredicate = cb.equal(root.get(NAME), companiesSortTypeDto.getName());
         } else if (companiesSortTypeDto.getDateFrom() != null) {
-            wherePredicate = cb.greaterThanOrEqualTo(root.get("creationDate"), companiesSortTypeDto.getDateFrom());
+            wherePredicate = cb.greaterThanOrEqualTo(root.get(CREATION_DATE), companiesSortTypeDto.getDateFrom());
         } else if (companiesSortTypeDto.getDateTo() != null) {
-            wherePredicate = cb.lessThanOrEqualTo(root.get("creationDate"), companiesSortTypeDto.getDateTo());
+            wherePredicate = cb.lessThanOrEqualTo(root.get(CREATION_DATE), companiesSortTypeDto.getDateTo());
         }
 
-        //todo make join
+
         cq.where(wherePredicate);
-        Path<Company> companyPath = root.get("unp");
-        if (companiesSortTypeDto.getSortKey().equals("name")) {
-            companyPath = root.get("name");
-        } else if (companiesSortTypeDto.getSortKey().equals("creationDate")) {
-            companyPath = root.get("creationDate");
+        Path<Company> companyPath = root.get(UNP);
+        if (companiesSortTypeDto.getSortKey().equals(NAME)) {
+            companyPath = root.get(NAME);
+        } else if (companiesSortTypeDto.getSortKey().equals(CREATION_DATE)) {
+            companyPath = root.get(CREATION_DATE);
         }
         if (companiesSortTypeDto.getSortType().equals(SortType.ASC)) {
             cq.orderBy(cb.asc(companyPath));
@@ -81,12 +95,7 @@ public class CompanyController {
 
     @GetMapping("/showEmployees")
     public ResponseEntity<List<Employee>> showEmployees(@RequestParam @Pattern(regexp = "\\d{9}") String unp) {
-
-        Session session = entityManager.unwrap(Session.class);
-        String hql = "select employees from Company where unp = :unp";
-        Query<Employee> query = session.createQuery(hql, Employee.class);
-        query.setParameter("unp",unp);
-        return new ResponseEntity<>(query.list(),HttpStatus.OK);
+        return new ResponseEntity<>(companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp).stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList()), HttpStatus.OK);
     }
 
 
@@ -97,38 +106,54 @@ public class CompanyController {
         Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(unp);
         if (optionalCompany.isPresent()) {
             Company company = optionalCompany.get();
-            Set<Employee> employees = company.getEmployees();
-            boolean existsWithPassportNumber = employees.stream().anyMatch(employee -> employee.getPassportNumber().equals(passportNumber));
-            if (!existsWithPassportNumber) {
-                String firstName = employeeFormDto.getFirstName();
-                String lastName = employeeFormDto.getLastName();
-                String patronymic = employeeFormDto.getPatronymic();
-                Date birthdate = employeeFormDto.getBirthdate();
-                String jobTitle = employeeFormDto.getJobTitle();
-                //todo not good create every time new employee, ask
-                Employee employee = new Employee(firstName, lastName, patronymic, jobTitle, birthdate, passportNumber);
-                //employee.getCompanies().add(company);
+            Optional<Employee> optionalEmployee = employeeRepository.findEmployeesByPassportNumber(passportNumber);
+            Employee employee;
+            if (optionalEmployee.isPresent()) {
+                employee = optionalEmployee.get();
+            } else {
+                employee = employeeMapper.employeeDtoToEmployee(employeeFormDto);
                 employeeRepository.save(employee);
-                company.getEmployees().add(employee);
-                companyRepository.save(company);
 
-                return new ResponseEntity<>(employee, HttpStatus.CREATED);
             }
+            CompanyEmployeeId companyEmployeeId = new CompanyEmployeeId(company.getCompanyId(), employee.getEmployeeId());
+            CompanyEmployee companyEmployee = new CompanyEmployee(companyEmployeeId);
+            companyEmployee.setEmployee(employee);
+            companyEmployee.setCompany(company);
+            companyEmployeeRepository.save(companyEmployee);
+            return new ResponseEntity<>(employee, HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
+    @DeleteMapping("/deleteEmployee")
+    public ResponseEntity<Employee> deleteEmployee(@RequestParam Long id) {
+        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+        if (optionalEmployee.isPresent()) {
+            Employee employee = optionalEmployee.get();
+            List<CompanyEmployee> companyEmployeeByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
+            companyEmployeeRepository.deleteAll(companyEmployeeByEmployee);
+            employeeRepository.delete(employee);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/deleteEmployee")
-    public ResponseEntity<Employee> deleteEmployee(@RequestParam Long id) {
-
-        employeeRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @DeleteMapping("/deleteCompany")
     public ResponseEntity<Company> deleteCompany(@RequestParam @Pattern(regexp = "\\d{9}") String unp) {
+        List<CompanyEmployee> companyEmployees = companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp);
+        List<Employee> employeeList = companyEmployees.stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList());
+        companyEmployeeRepository.deleteAll(companyEmployees);
         Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(unp);
         optionalCompany.ifPresent(company -> companyRepository.delete(company));
+        for (Employee employee : employeeList) {
+            List<CompanyEmployee> companyByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
+            if (companyByEmployee.isEmpty()) {
+                employeeRepository.delete(employee);
+            }
+        }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

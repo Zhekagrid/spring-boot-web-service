@@ -1,20 +1,29 @@
 package com.example.webservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
-//@Data
-//@Entity
-//@Table(name = "COMPANY_EMPLOYEES")
+@Data
+@Entity
+@Table(name = "COMPANY_EMPLOYEES")
 public class CompanyEmployee {
-//    @Id
-//    @GeneratedValue
-    private Long id;
-    private Long companyId;
-    private Long employeeId;
+    @EmbeddedId
+    private CompanyEmployeeId companyEmployeeId;
+
+    public CompanyEmployee(CompanyEmployeeId companyEmployeeId) {
+        this.companyEmployeeId = companyEmployeeId;
+    }
+
+    @ManyToOne
+    @MapsId("companyId")
+    private Company company;
+
+    @ManyToOne
+    @MapsId("employeeId")
+    private Employee employee;
 
 
+    public CompanyEmployee() {
+
+    }
 }

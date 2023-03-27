@@ -1,16 +1,9 @@
 package com.example.webservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.awt.print.Book;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
@@ -20,7 +13,7 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id", unique = true, nullable = false)
 
-    private Long id;
+    private Long employeeId;
     @Column(nullable = false, length = 64)
     private String firstName;
     @Column(nullable = false, length = 64)
@@ -35,15 +28,6 @@ public class Employee {
     @Column(nullable = false, length = 14)
     private String passportNumber;
 
-//    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
-//    @JoinTable(name = "company_employee",
-//            joinColumns = @JoinColumn(name = "employee_id"),
-//            inverseJoinColumns = @JoinColumn(name = "company_id"))
-//    private Set<Company> companies=new HashSet<>();
-
-
-//    @ManyToMany(mappedBy = "employees",fetch = FetchType.LAZY)
-//    private Set<Company> companies=new HashSet<>();
     public Employee(String firstName, String lastName, String patronymic, String jobTitle, Date birthdate, String passportNumber) {
         this.firstName = firstName;
         this.lastName = lastName;

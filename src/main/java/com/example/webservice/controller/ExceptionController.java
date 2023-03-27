@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
+    private static final String ERRORS_KEY = "errors";
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, List<String>> body = new HashMap<>();
@@ -29,7 +31,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
-        body.put("errors", errors);
+        body.put(ERRORS_KEY, errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -42,7 +44,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
             errors.add(violation.getMessage());
         }
         Map<String, List<String>> body = new HashMap<>();
-        body.put("errors", errors);
+        body.put(ERRORS_KEY, errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
