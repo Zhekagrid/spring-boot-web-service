@@ -3,11 +3,8 @@ package com.example.webservice.controller;
 import com.example.webservice.model.dto.BaseDto;
 import com.example.webservice.model.dto.CompaniesSortTypeDto;
 import com.example.webservice.model.dto.CompanyDto;
-import com.example.webservice.model.dto.EmployeeFormDto;
 import com.example.webservice.model.entity.Company;
-import com.example.webservice.model.entity.Employee;
 import com.example.webservice.service.CompanyService;
-import com.example.webservice.service.EmployeeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -22,8 +19,7 @@ import java.util.List;
 @Validated
 @RequestMapping("/company")
 public class CompanyController {
-    @Autowired
-    private EmployeeService employeeService;
+
 
     @Autowired
     private CompanyService companyService;
@@ -45,22 +41,7 @@ public class CompanyController {
 
     }
 
-    @GetMapping("/showEmployees")
-    public ResponseEntity<List<Employee>> showEmployees(@RequestParam @Pattern(regexp = "\\d{9}") String unp) {
-        return employeeService.showEmployees(unp);
-    }
 
-
-    @PutMapping("/addEmployee")
-    public ResponseEntity<? extends BaseDto> addEmployee(@Valid @RequestBody EmployeeFormDto employeeFormDto) {
-        return employeeService.addEmployee(employeeFormDto);
-    }
-
-
-    @DeleteMapping("/deleteEmployee")
-    public ResponseEntity<? extends BaseDto> deleteEmployee(@RequestParam Long id) {
-        return employeeService.deleteEmployee(id);
-    }
 
     @DeleteMapping("/deleteCompany")
     public ResponseEntity<? extends BaseDto> deleteCompany(@RequestParam @Pattern(regexp = "\\d{9}") String unp) {
