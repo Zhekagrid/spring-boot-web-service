@@ -1,19 +1,18 @@
 package com.example.webservice.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
-public class EmployeeFormDto {
+@Setter
+@Getter
+public class EmployeeFormDto extends BaseDto {
+
     @Pattern(regexp = "\\d{9}")
     private String unp;
     @NotBlank
@@ -32,4 +31,8 @@ public class EmployeeFormDto {
     @NotBlank
     @Pattern(regexp = "\\d{14}")
     private String passportNumber;
+
+
+    public EmployeeFormDto() {
+    }
 }

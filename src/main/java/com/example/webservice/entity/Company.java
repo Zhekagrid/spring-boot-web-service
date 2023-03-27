@@ -1,17 +1,15 @@
 package com.example.webservice.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
 
 @Entity
-@Data
+@Setter
+@Getter
 @Table(name = "COMPANIES")
 public class Company {
 
@@ -21,16 +19,13 @@ public class Company {
     private Long companyId;
 
     @Column(nullable = false)
-    @NotBlank(message = "Name required")
-    @Size(max = 256)
+
     private String name;
 
     @Column(nullable = false, unique = true)
-    @Pattern(regexp = "\\d{9}", message = "Only 9 digits")
     private String unp;
 
-    @Column(name = "creation_date",nullable = false)
-    @NotNull(message = "Creation date required")
+    @Column(name = "creation_date", nullable = false)
     private Date creationDate;
 
 

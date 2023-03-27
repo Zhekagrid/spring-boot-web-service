@@ -1,9 +1,11 @@
 package com.example.webservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @Entity
 @Table(name = "COMPANY_EMPLOYEES")
 public class CompanyEmployee {

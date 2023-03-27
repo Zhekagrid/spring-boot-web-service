@@ -5,6 +5,8 @@ import com.example.webservice.entity.Employee;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface EmployeeMapper  {
+public interface EmployeeMapper {
     Employee employeeDtoToEmployee(EmployeeFormDto employeeFormDto);
+
+    EmployeeFormDto employeeToEmployeeDto(Employee employee);
 }

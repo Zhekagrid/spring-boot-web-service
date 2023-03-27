@@ -4,7 +4,6 @@ import com.example.webservice.entity.User;
 import com.example.webservice.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -17,17 +16,15 @@ import java.util.Optional;
 
 @Component
 public class CustomBasicAuthFilter extends BasicAuthenticationFilter {
-
-    private UserRepository userRepository;
-
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
     public CustomBasicAuthFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
+
+    
+
 
     protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) {
         UserDetails userDetails = (UserDetails) authResult.getPrincipal();

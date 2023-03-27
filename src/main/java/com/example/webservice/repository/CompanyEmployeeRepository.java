@@ -12,5 +12,7 @@ import java.util.List;
 public interface CompanyEmployeeRepository extends CrudRepository<CompanyEmployee, CompanyEmployeeId> {
     List<CompanyEmployee> findCompanyEmployeeByCompanyUnp(String unp);
 
+    boolean existsByCompanyUnpAndEmployeePassportNumber(String unp, String passportNumber);
+
     List<CompanyEmployee> findCompanyEmployeeByEmployeePassportNumber(String passportNumber);
 }

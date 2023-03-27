@@ -2,7 +2,6 @@ package com.example.webservice.controller;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -29,8 +28,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
+                .map(x -> x.getField() + " " + x.getDefaultMessage()).collect(Collectors.toList());
         body.put(ERRORS_KEY, errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -41,7 +39,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
         List<String> errors = new ArrayList<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errors.add(violation.getMessage());
+            errors.add(violation.getPropertyPath()+" "+ violation.getMessage());
         }
         Map<String, List<String>> body = new HashMap<>();
         body.put(ERRORS_KEY, errors);

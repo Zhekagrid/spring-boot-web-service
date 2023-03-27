@@ -1,52 +1,53 @@
 package com.example.webservice.controller;
 
+import com.example.webservice.dto.BaseDto;
+import com.example.webservice.dto.ErrorInfo;
 import com.example.webservice.dto.LoginInfoDto;
-import com.example.webservice.mapper.UserMapper;
 import com.example.webservice.entity.User;
-import com.example.webservice.repository.UserRepository;
+import com.example.webservice.mapper.UserMapper;
+import com.example.webservice.service.UserService;
 import jakarta.validation.Valid;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
     private static final String USER_LOGIN_UNIQUE = "Login must be unique";
+
     private static final String USER_SIGNED_SUCCESS = "User signed-in successfully!.";
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private UserService userService;
+    @Autowired
     private AuthenticationManager authenticationManager;
-
-
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-    }
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @PostMapping(value = "/signUp")
-    public ResponseEntity<User> signUp(@Valid @RequestBody LoginInfoDto loginInfoDto) {
-        String username = loginInfoDto.getUsername();
-        if (!userRepository.existsByUsername(username)) {
-            User user = userMapper.loginDtoToUser(loginInfoDto);
-            String password = user.getPassword();
-            String encodedPassword = passwordEncoder.encode(password);
-            user.setPassword(encodedPassword);
-            User createdUser = userRepository.save(user);
-            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<? extends BaseDto> signUp(@Valid @RequestBody LoginInfoDto loginInfoDto) {
+        Optional<User> optionalUser = userService.signUp(loginInfoDto);
+
+        if (optionalUser.isPresent()) {
+            LoginInfoDto responseLoginDto = userMapper.userToLoginDto(optionalUser.get());
+            return new ResponseEntity<>(responseLoginDto, HttpStatus.CREATED);
+
         } else {
-            return new ResponseEntity<>(new User(USER_LOGIN_UNIQUE), HttpStatus.BAD_REQUEST);
+            ErrorInfo errorInfo = new ErrorInfo(USER_LOGIN_UNIQUE, 400);
+            return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
         }
+
     }
 
     @PostMapping("/signIn")
