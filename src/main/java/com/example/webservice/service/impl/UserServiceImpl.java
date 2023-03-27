@@ -15,8 +15,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -53,6 +57,13 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> signIn(LoginInfoDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(), loginDto.getPassword()));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        Optional<User> user = userRepository.findUserByUsername(username);
+        if (user.isPresent()) {
+            user.get().setLastLoginDate(LocalDate.now());
+            userRepository.save(user.get());
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new ResponseEntity<>(USER_SIGNED_SUCCESS, HttpStatus.OK);
     }
