@@ -1,11 +1,15 @@
-package com.example.webservice.entity;
+package com.example.webservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "EMPLOYEES")
 public class Employee {
@@ -28,16 +32,6 @@ public class Employee {
     @Column(nullable = false, length = 14)
     private String passportNumber;
 
-    public Employee(String firstName, String lastName, String patronymic, String jobTitle, Date birthdate, String passportNumber) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.patronymic = patronymic;
-        this.jobTitle = jobTitle;
-        this.birthdate = birthdate;
-        this.passportNumber = passportNumber;
-    }
 
-    public Employee() {
 
-    }
 }

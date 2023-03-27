@@ -1,7 +1,7 @@
 package com.example.webservice.config;
 
-import com.example.webservice.entity.User;
-import com.example.webservice.repository.UserRepository;
+import com.example.webservice.model.entity.User;
+import com.example.webservice.model.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

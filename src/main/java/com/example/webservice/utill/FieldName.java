@@ -1,4 +1,4 @@
-package com.example.webservice.controller;
+package com.example.webservice.utill;
 
 public class FieldName {
     public static final String CREATION_DATE="creationDate";

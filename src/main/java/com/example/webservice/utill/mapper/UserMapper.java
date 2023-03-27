@@ -1,7 +1,7 @@
-package com.example.webservice.mapper;
+package com.example.webservice.utill.mapper;
 
-import com.example.webservice.dto.LoginInfoDto;
-import com.example.webservice.entity.User;
+import com.example.webservice.model.dto.LoginInfoDto;
+import com.example.webservice.model.entity.User;
 import org.mapstruct.Mapper;
 
 @Mapper

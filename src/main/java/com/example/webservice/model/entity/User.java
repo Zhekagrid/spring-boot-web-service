@@ -1,7 +1,8 @@
-package com.example.webservice.entity;
+package com.example.webservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -10,9 +11,8 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @Table(name = "USERS")
+@NoArgsConstructor
 public class User {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,12 +22,5 @@ public class User {
     private String password;
     @Column
     private LocalDate lastLoginDate;
-
-    public User() {
-
-    }
-
-
-
 
 }

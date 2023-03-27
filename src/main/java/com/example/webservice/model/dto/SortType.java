@@ -1,4 +1,4 @@
-package com.example.webservice.dto;
+package com.example.webservice.model.dto;
 
 public enum SortType {
     ASC,

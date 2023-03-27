@@ -1,7 +1,7 @@
 package com.example.webservice.config;
 
-import com.example.webservice.entity.User;
-import com.example.webservice.repository.UserRepository;
+import com.example.webservice.model.entity.User;
+import com.example.webservice.model.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

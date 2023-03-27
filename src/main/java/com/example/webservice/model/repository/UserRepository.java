@@ -1,6 +1,6 @@
-package com.example.webservice.repository;
+package com.example.webservice.model.repository;
 
-import com.example.webservice.entity.User;
+import com.example.webservice.model.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

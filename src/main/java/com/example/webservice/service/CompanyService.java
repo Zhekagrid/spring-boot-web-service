@@ -1,28 +1,32 @@
 package com.example.webservice.service;
 
-import com.example.webservice.dto.CompaniesSortTypeDto;
-import com.example.webservice.dto.SortType;
-import com.example.webservice.entity.Company;
-import com.example.webservice.entity.CompanyEmployee;
-import com.example.webservice.entity.Employee;
-import com.example.webservice.repository.CompanyEmployeeRepository;
-import com.example.webservice.repository.CompanyRepository;
-import com.example.webservice.repository.EmployeeRepository;
+import com.example.webservice.model.dto.*;
+import com.example.webservice.model.entity.Company;
+import com.example.webservice.model.entity.CompanyEmployee;
+import com.example.webservice.model.entity.Employee;
+import com.example.webservice.model.repository.CompanyEmployeeRepository;
+import com.example.webservice.model.repository.CompanyRepository;
+import com.example.webservice.model.repository.EmployeeRepository;
+import com.example.webservice.utill.mapper.CompanyMapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.webservice.controller.FieldName.*;
+import static com.example.webservice.utill.FieldName.*;
 
 @Service
 public class CompanyService {
+    private final CompanyMapper companyMapper = Mappers.getMapper(CompanyMapper.class);
     @Autowired
     private CompanyRepository companyRepository;
     @Autowired
@@ -30,12 +34,17 @@ public class CompanyService {
     @Autowired
     private CompanyEmployeeRepository companyEmployeeRepository;
 
-    public Optional<Company> addCompany(Company company) {
+    public ResponseEntity<? extends BaseDto> addCompany(CompanyDto companyDto) {
+
+        Company company = companyMapper.companyDtoToCompany(companyDto);
         Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(company.getUnp());
         if (optionalCompany.isEmpty()) {
-            return Optional.of(companyRepository.save(company));
+            CompanyDto responseCompanyDto = companyMapper.companyToCompanyDto(companyRepository.save(company));
+            return new ResponseEntity<>(responseCompanyDto, HttpStatus.CREATED);
+
         }
-        return Optional.empty();
+        ErrorInfo errorInfo = new ErrorInfo("Company already created", 400);
+        return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
     }
 
     public Optional<Company> findCompanyByUnp(String unp) {
@@ -43,22 +52,27 @@ public class CompanyService {
     }
 
 
-    public void deleteCompany(String unp) {
-        List<CompanyEmployee> companyEmployees = companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp);
-        List<Employee> employeeList = companyEmployees.stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList());
-        companyEmployeeRepository.deleteAll(companyEmployees);
-        Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(unp);
-        optionalCompany.ifPresent(company -> companyRepository.delete(company));
-        for (Employee employee : employeeList) {
-            List<CompanyEmployee> companyByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
-            if (companyByEmployee.isEmpty()) {
-                employeeRepository.delete(employee);
-            }
-        }
+    public ResponseEntity<? extends BaseDto> deleteCompany(String unp) {
 
+        Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(unp);
+        if (optionalCompany.isPresent()) {
+            List<CompanyEmployee> companyEmployees = companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp);
+            List<Employee> employeeList = companyEmployees.stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList());
+            companyEmployeeRepository.deleteAll(companyEmployees);
+            optionalCompany.ifPresent(company -> companyRepository.delete(company));
+            for (Employee employee : employeeList) {
+                List<CompanyEmployee> companyByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
+                if (companyByEmployee.isEmpty()) {
+                    employeeRepository.delete(employee);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        ErrorInfo errorInfo = new ErrorInfo("Company doesn't exist", 400);
+        return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
     }
 
-    public List<Company> showCompanies(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize) {
+    public ResponseEntity<List<Company>> showCompanies(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize) {
 
         Specification<Company> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.isNotNull(root.get(UNP));
@@ -88,7 +102,7 @@ public class CompanyService {
             sort = sort.descending();
         }
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        return companyRepository.findAll(specification, pageable);
+        return new ResponseEntity<>(companyRepository.findAll(specification, pageable), HttpStatus.OK);
     }
 
 }

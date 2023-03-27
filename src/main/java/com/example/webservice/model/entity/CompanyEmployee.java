@@ -1,13 +1,15 @@
-package com.example.webservice.entity;
+package com.example.webservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "COMPANY_EMPLOYEES")
+@NoArgsConstructor
 public class CompanyEmployee {
     @EmbeddedId
     private CompanyEmployeeId companyEmployeeId;
@@ -24,8 +26,4 @@ public class CompanyEmployee {
     @MapsId("employeeId")
     private Employee employee;
 
-
-    public CompanyEmployee() {
-
-    }
 }

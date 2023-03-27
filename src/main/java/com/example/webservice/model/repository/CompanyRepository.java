@@ -1,7 +1,7 @@
-package com.example.webservice.repository;
+package com.example.webservice.model.repository;
 
 
-import com.example.webservice.entity.Company;
+import com.example.webservice.model.entity.Company;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.CrudRepository;

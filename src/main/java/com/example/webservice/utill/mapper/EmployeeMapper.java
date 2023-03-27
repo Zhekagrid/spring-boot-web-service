@@ -1,7 +1,7 @@
-package com.example.webservice.mapper;
+package com.example.webservice.utill.mapper;
 
-import com.example.webservice.dto.EmployeeFormDto;
-import com.example.webservice.entity.Employee;
+import com.example.webservice.model.dto.EmployeeFormDto;
+import com.example.webservice.model.entity.Employee;
 import org.mapstruct.Mapper;
 
 @Mapper
