@@ -24,7 +24,7 @@ public class EmployeeFormDto extends BaseDto {
     private String firstName;
     @Size(max = 64)
     private String patronymic;
-    @NotBlank
+    @NotNull
     private EmployeeType employeeType;
     @NotNull
     private Date birthdate;

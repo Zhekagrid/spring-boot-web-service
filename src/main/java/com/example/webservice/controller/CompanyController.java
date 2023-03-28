@@ -32,7 +32,7 @@ public class CompanyController {
     }
 
     @GetMapping("/showCompanies")
-    public ResponseEntity<List<Company>> showCompanies(@RequestBody CompaniesSortTypeDto companiesSortTypeDto,
+    public ResponseEntity<List<Company>> showCompanies(@Valid @RequestBody CompaniesSortTypeDto companiesSortTypeDto,
                                                        @RequestParam @Min(value = 0, message = "page number >0") int pageNumber,
                                                        @RequestParam @Min(value = 0, message = "page size > 0") int pageSize) {
 

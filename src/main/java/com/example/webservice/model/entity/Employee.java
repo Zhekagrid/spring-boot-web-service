@@ -29,8 +29,8 @@ public class Employee {
 
     @Column(length = 64)
     private String patronymic;
-    @Column(nullable = false, length = 64)
-    private String jobTitle;
+    @Column(nullable = false)
+    private EmployeeType employeeType;
     @Column(nullable = false)
     private Date birthdate;
     @Column(nullable = false, length = 14)
