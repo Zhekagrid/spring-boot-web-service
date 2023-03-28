@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -32,6 +34,7 @@ public class Employee {
     @Column(nullable = false, length = 14)
     private String passportNumber;
 
-
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "employee", orphanRemoval = true)
+    private List<CompanyEmployee> companyEmployees = new ArrayList<>();
 
 }

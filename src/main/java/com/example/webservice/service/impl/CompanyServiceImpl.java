@@ -45,6 +45,7 @@ public class CompanyServiceImpl implements CompanyService {
             return new ResponseEntity<>(responseCompanyDto, HttpStatus.CREATED);
 
         }
+
         ErrorInfo errorInfo = new ErrorInfo("Company already created", 400);
         return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
     }
@@ -56,12 +57,10 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public ResponseEntity<? extends BaseDto> deleteCompany(String unp) {
-
         Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(unp);
         if (optionalCompany.isPresent()) {
             List<CompanyEmployee> companyEmployees = companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp);
             List<Employee> employeeList = companyEmployees.stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList());
-            companyEmployeeRepository.deleteAll(companyEmployees);
             optionalCompany.ifPresent(company -> companyRepository.delete(company));
             for (Employee employee : employeeList) {
                 List<CompanyEmployee> companyByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
@@ -77,7 +76,6 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public ResponseEntity<List<Company>> showCompanies(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize) {
-
         Specification<Company> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.isNotNull(root.get(UNP));
         if (companiesSortTypeDto.getName() != null) {

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -28,5 +30,8 @@ public class Company {
     @Column(name = "creation_date", nullable = false)
     private Date creationDate;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "company",orphanRemoval = true)
+
+    private List<CompanyEmployee> companyEmployees = new ArrayList<>();
 
 }

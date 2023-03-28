@@ -1,5 +1,6 @@
 package com.example.webservice.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,15 @@ public class CompanyEmployee {
     }
 
     @ManyToOne
+    @JsonIgnore
     @MapsId("companyId")
+    @JoinColumn(name = "company_id")
     private Company company;
 
     @ManyToOne
+    @JsonIgnore
     @MapsId("employeeId")
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
 }

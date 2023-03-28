@@ -71,8 +71,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
         if (optionalEmployee.isPresent()) {
             Employee employee = optionalEmployee.get();
-            List<CompanyEmployee> companyEmployeeByEmployee = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());
-            companyEmployeeRepository.deleteAll(companyEmployeeByEmployee);
             employeeRepository.delete(employee);
             return new ResponseEntity<>(HttpStatus.OK);
         }
