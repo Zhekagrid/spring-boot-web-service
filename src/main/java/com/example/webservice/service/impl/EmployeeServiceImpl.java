@@ -76,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (optionalEmployee.isPresent()) {
             Employee employee = optionalEmployee.get();
             employeeRepository.delete(employee);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
         ErrorInfo errorInfo = new ErrorInfo(EMPLOYEE_NOT_EXIST, httpStatus.value());

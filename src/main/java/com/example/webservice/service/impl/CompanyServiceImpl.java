@@ -70,7 +70,7 @@ public class CompanyServiceImpl implements CompanyService {
                     employeeRepository.delete(employee);
                 }
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
         ErrorInfo errorInfo = new ErrorInfo(COMPANY_NOT_EXIST, httpStatus.value());
