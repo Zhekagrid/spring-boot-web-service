@@ -43,11 +43,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             boolean employeeInCompanyWork = companyEmployeeRepository.existsByCompanyUnpAndEmployeePassportNumber(unp, passportNumber);
             if (!employeeInCompanyWork) {
                 Optional<Employee> optionalEmployee = employeeRepository.findEmployeesByPassportNumber(passportNumber);
-                Employee employee;
-                if (optionalEmployee.isEmpty()) {
-                    employee = employeeMapper.employeeDtoToEmployee(employeeFormDto);
+                Employee employee = employeeMapper.employeeDtoToEmployee(employeeFormDto);
+                if (optionalEmployee.isEmpty() || !optionalEmployee.get().equals(employee)) {
                     employeeRepository.save(employee);
-
                 } else {
                     employee = optionalEmployee.get();
                 }
@@ -61,11 +59,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 return new ResponseEntity<>(responseEmployeeDto, HttpStatus.CREATED);
 
             }
-            HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+            HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
             ErrorInfo errorInfo = new ErrorInfo(EMPLOYEE_ALREADY_WORK, httpStatus.value());
             return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
         }
-        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorInfo errorInfo = new ErrorInfo(COMPANY_NOT_EXIST, httpStatus.value());
         return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
     }
@@ -78,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeRepository.delete(employee);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ErrorInfo errorInfo = new ErrorInfo(EMPLOYEE_NOT_EXIST, httpStatus.value());
         return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
 

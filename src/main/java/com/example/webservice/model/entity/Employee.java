@@ -1,6 +1,7 @@
 package com.example.webservice.model.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "EMPLOYEES")
+@EqualsAndHashCode(exclude = {"birthdate", "employeeId"})
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
