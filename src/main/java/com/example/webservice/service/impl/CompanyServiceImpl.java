@@ -27,6 +27,8 @@ import static com.example.webservice.utill.FieldName.*;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
+    private static final String COMPANY_ALREADY_CREATED = "Company already created";
+    private static final String COMPANY_NOT_EXIST = "Company doesn't exist";
     private final CompanyMapper companyMapper = Mappers.getMapper(CompanyMapper.class);
     @Autowired
     private CompanyRepository companyRepository;
@@ -45,9 +47,9 @@ public class CompanyServiceImpl implements CompanyService {
             return new ResponseEntity<>(responseCompanyDto, HttpStatus.CREATED);
 
         }
-
-        ErrorInfo errorInfo = new ErrorInfo("Company already created", 400);
-        return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
+        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        ErrorInfo errorInfo = new ErrorInfo(COMPANY_ALREADY_CREATED, httpStatus.value());
+        return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
     }
 
     @Override
@@ -70,8 +72,9 @@ public class CompanyServiceImpl implements CompanyService {
             }
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        ErrorInfo errorInfo = new ErrorInfo("Company doesn't exist", 400);
-        return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
+        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        ErrorInfo errorInfo = new ErrorInfo(COMPANY_NOT_EXIST, httpStatus.value());
+        return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
     }
 
     @Override

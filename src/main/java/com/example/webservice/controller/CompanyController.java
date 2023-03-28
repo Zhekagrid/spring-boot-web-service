@@ -38,7 +38,6 @@ public class CompanyController {
 
         return companyService.showCompanies(companiesSortTypeDto, pageNumber, pageSize);
 
-
     }
 
 

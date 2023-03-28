@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-
+    private static final String EMPLOYEE_ALREADY_WORK = "Employee already work in this company";
+    private static final String EMPLOYEE_NOT_EXIST = "Employee doesn't exist";
+    private static final String COMPANY_NOT_EXIST = "Company doesn't exist";
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
@@ -59,11 +61,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 return new ResponseEntity<>(responseEmployeeDto, HttpStatus.CREATED);
 
             }
-            ErrorInfo errorInfo = new ErrorInfo("Employee already work in this company", 400);
-            return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
+            HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+            ErrorInfo errorInfo = new ErrorInfo(EMPLOYEE_ALREADY_WORK, httpStatus.value());
+            return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
         }
-        ErrorInfo errorInfo = new ErrorInfo("Company doesn't exist", 400);
-        return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
+        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        ErrorInfo errorInfo = new ErrorInfo(COMPANY_NOT_EXIST, httpStatus.value());
+        return new ResponseEntity<>(new BaseDto(errorInfo), httpStatus);
     }
 
     @Override
@@ -74,7 +78,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeRepository.delete(employee);
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        ErrorInfo errorInfo = new ErrorInfo("Employee doesn't exist", 400);
+        HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+        ErrorInfo errorInfo = new ErrorInfo(EMPLOYEE_NOT_EXIST, httpStatus.value());
         return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
 
     }

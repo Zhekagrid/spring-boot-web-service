@@ -2,6 +2,7 @@ package com.example.webservice.controller;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
     private static final String ERRORS_KEY = "errors";
+    private static final String SPACE = " ";
+    private static final String EMPTY_STRING = "";
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -28,21 +31,31 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(x -> x.getField() + " " + x.getDefaultMessage()).collect(Collectors.toList());
+                .map(x -> errorDescription(x.getField(), x.getDefaultMessage())).collect(Collectors.toList());
         body.put(ERRORS_KEY, errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<Object> handleConstraintViolation(
-            ConstraintViolationException ex, WebRequest request) {
+            ConstraintViolationException ex) {
 
         List<String> errors = new ArrayList<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errors.add(violation.getPropertyPath()+" "+ violation.getMessage());
+            String errorDescription = errorDescription(violation.getPropertyPath(), violation.getMessage());
+            errors.add(errorDescription);
         }
         Map<String, List<String>> body = new HashMap<>();
         body.put(ERRORS_KEY, errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+
+    private String errorDescription(String field, String message) {
+        return (field != null ? field : EMPTY_STRING) + SPACE + (message != null ? message : EMPTY_STRING);
+    }
+
+    private String errorDescription(Path propertyPath, String message) {
+        return (propertyPath != null ? propertyPath : EMPTY_STRING) + SPACE + (message != null ? message : EMPTY_STRING);
     }
 }

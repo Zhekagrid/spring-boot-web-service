@@ -47,8 +47,9 @@ public class UserServiceImpl implements UserService {
             User savedUser = userRepository.save(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
-            ErrorInfo errorInfo = new ErrorInfo(USER_LOGIN_UNIQUE, 400);
-            return new ResponseEntity<>(new BaseDto(errorInfo), HttpStatus.BAD_REQUEST);
+            HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+            ErrorInfo errorInfo = new ErrorInfo(USER_LOGIN_UNIQUE, httpStatus.value());
+            return new ResponseEntity<>(new BaseDto(errorInfo),httpStatus);
         }
 
     }
@@ -57,6 +58,13 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> signIn(LoginInfoDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(), loginDto.getPassword()));
+        setUserLastLoginDate(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new ResponseEntity<>(USER_SIGNED_SUCCESS, HttpStatus.OK);
+    }
+
+    @Override
+    public void setUserLastLoginDate(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
         Optional<User> user = userRepository.findUserByUsername(username);
@@ -64,8 +72,7 @@ public class UserServiceImpl implements UserService {
             user.get().setLastLoginDate(LocalDate.now());
             userRepository.save(user.get());
         }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>(USER_SIGNED_SUCCESS, HttpStatus.OK);
     }
+
 
 }
