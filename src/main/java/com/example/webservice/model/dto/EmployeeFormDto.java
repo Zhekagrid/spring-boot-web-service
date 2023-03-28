@@ -1,5 +1,6 @@
 package com.example.webservice.model.dto;
 
+import com.example.webservice.model.entity.EmployeeType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,8 +25,7 @@ public class EmployeeFormDto extends BaseDto {
     @Size(max = 64)
     private String patronymic;
     @NotBlank
-    @Size(max = 64)
-    private String jobTitle;
+    private EmployeeType employeeType;
     @NotNull
     private Date birthdate;
     @NotBlank

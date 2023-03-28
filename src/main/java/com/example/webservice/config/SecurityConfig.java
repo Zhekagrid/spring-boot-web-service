@@ -32,6 +32,7 @@ public class SecurityConfig {
             Optional<User> optionalUser = userRepository.findUserByUsername(username);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
+               //todo authorities
                 return org.springframework.security.core.userdetails.User.withUsername(user.getUsername()).password(user.getPassword())
                         .authorities(AUTHORITY).build();
             }
