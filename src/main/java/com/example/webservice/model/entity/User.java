@@ -1,5 +1,6 @@
 package com.example.webservice.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,12 @@ public class User {
     @Column(nullable = false, unique = true, length = 16)
     private String username;
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
     @Column
     private LocalDate lastLoginDate;
+    @JsonIgnore
+    @OneToOne(mappedBy = "user")
+    private Employee employee;
 
 }

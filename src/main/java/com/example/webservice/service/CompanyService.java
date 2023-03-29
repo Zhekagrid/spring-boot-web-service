@@ -16,5 +16,12 @@ public interface CompanyService {
 
     ResponseEntity<? extends BaseDto> deleteCompany(String unp);
 
-    ResponseEntity<List<Company>> showCompanies(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize);
+    ResponseEntity<List<Company>> findAllCompanies(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize);
+
+
+    ResponseEntity<List<Company>> findAllCompaniesForDirector(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize);
+
+    List<Company> findCompaniesForAuthenticatedUser();
 }
+
+

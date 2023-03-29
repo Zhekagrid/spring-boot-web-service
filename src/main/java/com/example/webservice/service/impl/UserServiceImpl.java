@@ -1,11 +1,11 @@
 package com.example.webservice.service.impl;
 
 import com.example.webservice.model.dto.BaseDto;
-import com.example.webservice.model.dto.ErrorInfo;
 import com.example.webservice.model.dto.LoginInfoDto;
 import com.example.webservice.model.entity.User;
 import com.example.webservice.model.repository.UserRepository;
 import com.example.webservice.service.UserService;
+import com.example.webservice.utill.ErrorResponseEntityFactory;
 import com.example.webservice.utill.mapper.UserMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +44,10 @@ public class UserServiceImpl implements UserService {
             String password = user.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             user.setPassword(encodedPassword);
-            User savedUser = userRepository.save(user);
+            userRepository.save(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
-            HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
-            ErrorInfo errorInfo = new ErrorInfo(USER_LOGIN_UNIQUE, httpStatus.value());
-            return new ResponseEntity<>(new BaseDto(errorInfo),httpStatus);
+            return ErrorResponseEntityFactory.createErrorResponseEntity(USER_LOGIN_UNIQUE, HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -74,5 +72,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User getAuthenticatedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> optionalUser = userRepository.findUserByUsername(username);
+        //todo ask about if present, because this method should use in situations where user, can not be null
+        return optionalUser.get();
+    }
 
 }

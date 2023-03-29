@@ -37,4 +37,10 @@ public class EmployeeController {
     public ResponseEntity<? extends BaseDto> deleteEmployee(@RequestParam Long id) {
         return employeeService.deleteEmployee(id);
     }
+
+    @GetMapping("/showEmployeeInMyCompanies")
+
+    public ResponseEntity<List<Employee>> showEmployeeInMyCompany() {
+        return employeeService.findEmployeesInMyCompany();
+    }
 }

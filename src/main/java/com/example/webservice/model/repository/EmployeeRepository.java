@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     Optional<Employee> findEmployeesByPassportNumber(String passportNumber);
+
 }

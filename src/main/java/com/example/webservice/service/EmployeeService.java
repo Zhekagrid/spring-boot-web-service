@@ -13,4 +13,6 @@ public interface EmployeeService {
     ResponseEntity<? extends BaseDto> deleteEmployee(Long id);
 
     ResponseEntity<List<Employee>> showEmployees(String unp);
+
+    ResponseEntity<List<Employee>> findEmployeesInMyCompany();
 }

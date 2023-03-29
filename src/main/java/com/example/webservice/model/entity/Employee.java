@@ -15,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "EMPLOYEES")
-@EqualsAndHashCode(exclude = {"birthdate", "employeeId"})
+
+@EqualsAndHashCode(exclude = {"birthdate", "employeeId", "user", "companyEmployees"})
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,5 +39,9 @@ public class Employee {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "employee", orphanRemoval = true)
     private List<CompanyEmployee> companyEmployees = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

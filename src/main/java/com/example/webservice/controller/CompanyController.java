@@ -36,15 +36,22 @@ public class CompanyController {
                                                        @RequestParam @Min(value = 0, message = "page number >0") int pageNumber,
                                                        @RequestParam @Min(value = 0, message = "page size > 0") int pageSize) {
 
-        return companyService.showCompanies(companiesSortTypeDto, pageNumber, pageSize);
+        return companyService.findAllCompanies(companiesSortTypeDto, pageNumber, pageSize);
 
     }
-
 
 
     @DeleteMapping("/deleteCompany")
     public ResponseEntity<? extends BaseDto> deleteCompany(@RequestParam @Pattern(regexp = "\\d{9}") String unp) {
         return companyService.deleteCompany(unp);
 
+    }
+
+    @GetMapping("/showMyCompanies")
+    public ResponseEntity<List<Company>> showMyCompanies(@Valid @RequestBody CompaniesSortTypeDto companiesSortTypeDto,
+                                                         @RequestParam @Min(value = 0, message = "page number >0") int pageNumber,
+                                                         @RequestParam @Min(value = 0, message = "page size > 0") int pageSize) {
+
+        return companyService.findAllCompaniesForDirector(companiesSortTypeDto, pageNumber, pageSize);
     }
 }
