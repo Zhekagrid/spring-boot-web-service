@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequestMapping("/employee")
+@EnableMethodSecurity
 public class EmployeeController {
 
     @Autowired
@@ -39,7 +42,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/showEmployeeInMyCompanies")
-
+    @PreAuthorize("hasAuthority('director')")
     public ResponseEntity<List<Employee>> showEmployeeInMyCompany() {
         return employeeService.findEmployeesInMyCompany();
     }

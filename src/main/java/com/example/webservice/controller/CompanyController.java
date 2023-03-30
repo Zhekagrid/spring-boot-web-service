@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequestMapping("/company")
+@EnableMethodSecurity
 public class CompanyController {
 
 
@@ -48,6 +51,7 @@ public class CompanyController {
     }
 
     @GetMapping("/showMyCompanies")
+    @PreAuthorize("hasAuthority('worker')")
     public ResponseEntity<List<Company>> showMyCompanies(@Valid @RequestBody CompaniesSortTypeDto companiesSortTypeDto,
                                                          @RequestParam @Min(value = 0, message = "page number >0") int pageNumber,
                                                          @RequestParam @Min(value = 0, message = "page size > 0") int pageSize) {

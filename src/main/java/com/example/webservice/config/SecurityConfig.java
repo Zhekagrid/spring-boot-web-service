@@ -21,8 +21,6 @@ import java.util.Optional;
 @Configuration
 public class SecurityConfig {
     private static final String USERS_URL = "/users/*";
-    private static final String SHOW_EMPLOYEE_IN_MY_COMPANIES = "/employee/showEmployeeInMyCompanies";
-    private static final String SHOW_MY_COMPANIES = "/company/showMyCompanies";
     private static final String WORKER_AUTHORITY = "worker";
     private static final String DIRECTOR_AUTHORITY = "director";
     private static final String DEFAULT_AUTHORITY = "default";
@@ -71,8 +69,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.addFilterAt(basicAuthenticationFilter(), BasicAuthenticationFilter.class).
                 authorizeHttpRequests()
-                .requestMatchers(SHOW_EMPLOYEE_IN_MY_COMPANIES).hasAuthority(DIRECTOR_AUTHORITY)
-                .requestMatchers(SHOW_MY_COMPANIES).hasAuthority(WORKER_AUTHORITY)
                 .requestMatchers(USERS_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
