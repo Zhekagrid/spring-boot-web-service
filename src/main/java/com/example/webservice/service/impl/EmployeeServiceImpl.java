@@ -1,5 +1,6 @@
 package com.example.webservice.service.impl;
 
+import com.example.webservice.exception.UserNonAuthenticatedException;
 import com.example.webservice.model.dto.BaseDto;
 import com.example.webservice.model.dto.EmployeeFormDto;
 import com.example.webservice.model.entity.*;
@@ -38,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private UserService userService;
 
     @Override
-    public ResponseEntity<? extends BaseDto> addEmployee(EmployeeFormDto employeeFormDto) {
+    public ResponseEntity<? extends BaseDto> addEmployee(EmployeeFormDto employeeFormDto) throws UserNonAuthenticatedException {
         String unp = employeeFormDto.getUnp();
         Optional<Company> optionalCompany = companyService.findCompanyByUnp(unp);
         if (optionalCompany.isPresent()) {
@@ -108,12 +109,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public ResponseEntity<List<Employee>> showEmployees(String unp) {
+    public ResponseEntity<List<Employee>> findEmployees(String unp) {
         return new ResponseEntity<>(companyEmployeeRepository.findCompanyEmployeeByCompanyUnp(unp).stream().map(CompanyEmployee::getEmployee).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<Employee>> findEmployeesInMyCompany() {
+    public ResponseEntity<List<Employee>> findEmployeesInAuthenticatedUserCompanies() throws UserNonAuthenticatedException {
         List<Company> companies = companyService.findCompaniesForAuthenticatedUser();
         List<Employee> employees = new ArrayList<>();
         for (Company company : companies) {

@@ -34,7 +34,7 @@ public class Employee {
     private EmployeeType employeeType;
     @Column(nullable = false)
     private Date birthdate;
-    @Column(nullable = false, length = 14)
+    @Column(nullable = false, unique = true, length = 14)
     private String passportNumber;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "employee", orphanRemoval = true)

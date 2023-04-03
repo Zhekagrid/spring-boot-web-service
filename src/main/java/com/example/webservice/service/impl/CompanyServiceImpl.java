@@ -1,5 +1,6 @@
 package com.example.webservice.service.impl;
 
+import com.example.webservice.exception.UserNonAuthenticatedException;
 import com.example.webservice.model.dto.BaseDto;
 import com.example.webservice.model.dto.CompaniesSortTypeDto;
 import com.example.webservice.model.dto.CompanyDto;
@@ -47,7 +48,7 @@ public class CompanyServiceImpl implements CompanyService {
     UserService userService;
 
     @Override
-    public ResponseEntity<? extends BaseDto> addCompany(CompanyDto companyDto) {
+    public ResponseEntity<? extends BaseDto> createCompany(CompanyDto companyDto) {
 
         Company company = companyMapper.companyDtoToCompany(companyDto);
         Optional<Company> optionalCompany = companyRepository.findCompaniesByUnp(company.getUnp());
@@ -90,7 +91,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseEntity<List<Company>> findAllCompaniesForDirector(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize) {
+    public ResponseEntity<List<Company>> findAllCompaniesForDirector(CompaniesSortTypeDto companiesSortTypeDto, int pageNumber, int pageSize) throws UserNonAuthenticatedException {
         Specification<Company> specification = createSpecification(companiesSortTypeDto);
         Pageable pageable = createPageable(companiesSortTypeDto, pageNumber, pageSize);
         User user = userService.getAuthenticatedUser();
@@ -107,7 +108,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public List<Company> findCompaniesForAuthenticatedUser() {
+    public List<Company> findCompaniesForAuthenticatedUser() throws UserNonAuthenticatedException {
         User user = userService.getAuthenticatedUser();
         Employee employee = user.getEmployee();
         List<CompanyEmployee> companyEmployees = companyEmployeeRepository.findCompanyEmployeeByEmployeePassportNumber(employee.getPassportNumber());

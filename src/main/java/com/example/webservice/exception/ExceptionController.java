@@ -1,4 +1,4 @@
-package com.example.webservice.controller;
+package com.example.webservice.exception;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -25,6 +25,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     private static final String SPACE = " ";
     private static final String EMPTY_STRING = "";
 
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, List<String>> body = new HashMap<>();
@@ -47,6 +48,14 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         }
         Map<String, List<String>> body = new HashMap<>();
         body.put(ERRORS_KEY, errors);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({UserNonAuthenticatedException.class})
+    public ResponseEntity<Object> handleUserNonAuthenticated(UserNonAuthenticatedException ex) {
+
+        Map<String, String> body = new HashMap<>();
+        body.put(ERRORS_KEY, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 

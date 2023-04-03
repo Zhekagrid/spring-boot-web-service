@@ -1,5 +1,6 @@
 package com.example.webservice.service.impl;
 
+import com.example.webservice.exception.UserNonAuthenticatedException;
 import com.example.webservice.model.dto.BaseDto;
 import com.example.webservice.model.dto.LoginInfoDto;
 import com.example.webservice.model.entity.User;
@@ -26,7 +27,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private static final String USER_LOGIN_UNIQUE = "Login must be unique";
     private static final String USER_SIGNED_SUCCESS = "User signed-in successfully!.";
-
+    private static final String USER_NON_AUTHENTICATED_MESSAGE = "User non authenticated";
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Autowired
@@ -73,11 +74,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getAuthenticatedUser() {
+    public User getAuthenticatedUser() throws UserNonAuthenticatedException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> optionalUser = userRepository.findUserByUsername(username);
-        //todo ask about if present, because this method should use in situations where user, can not be null
-        return optionalUser.get();
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new UserNonAuthenticatedException(USER_NON_AUTHENTICATED_MESSAGE);
+        }
     }
 
 }
